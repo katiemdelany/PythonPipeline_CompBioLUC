@@ -35,9 +35,9 @@ def main():
     if args.downloadfiles:
         for i in args.SRR:
             InptFiles(i)
-            with open('miniproject.log', 'a') as f_out:
-                f_out.write('SRA files download done.')
-                f_out.close()
+    with open('miniproject.log', 'a') as f_out:
+        f_out.write('SRA files download done.')
+        f_out.close()
 
 
     
