@@ -5,7 +5,8 @@ from Bio import Entrez
 from Bio import SearchIO
 from Bio.Seq import Seq
 from Bio.Blast import NCBIWWW
-os.getcwd()
+curr =  os.getcwd()
+os.chdir(curr)
 
 def InptFiles(SRR):
     """
@@ -53,6 +54,23 @@ def Kallisto(SRR):
     os.system(kallisto_run)
 
 
+
+def SleuthInput():
+    SRRs = 'SRR5660030','SRR5660033','SRR5660044','SRR5660045'
+    covFile = open('cov.txt','w')
+    condition1 = "2dpi"
+    condition2 = "6dpi"
+    covFile.write('sample'+ '\t' + 'condition' + '\t' + 'path' + '\n')
+    for i in SRRs:
+        path = '/data/kdelany/compBio_miniProject/'+i
+        if int(i[3:])%2==0:
+            covFile.write(str(i)+ '\t' + condition1 + '\t'+ str(path)+ '\n')
+        else:
+            covFile.write(str(i)+ '\t' + condition2 + '\t'+ str(path)+ '\n')
+    covFile.close()
+
+
+
 def main():
     """ Takes in SRR id number arguments in command line and runs through"""
     
@@ -73,9 +91,15 @@ def main():
     with open('miniproject.log', 'a') as f_out:
         f_out.write('The HCMV genome (EF999921) has ' + str(result) + ' CDS.')
         f_out.close()
+
     
+
 #    for i in args.SRR:
 #        Kallisto(i)
+
+
+
+    SleuthInput()
     
 if __name__ == '__main__':
     main()
