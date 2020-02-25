@@ -114,6 +114,15 @@ def getNumReads(SRR):
         f.write(str(name)+' had ' +str(beforeCount) + ' read pairs before Bowtie2 filtering and '+ str(afterCount)+' pairs after.')
         f.close()
 
+        
+def SPAdes(SRRs):
+    spades_cmd = 'spades -k 55,77,88,127, -t 2 -s ' +SRRs[0]+ '_bow.fastq ' + SRRs[1]+'_bow.fastq ' SRRs[2]+ '_bow.fastq '+ SRRs[3] + '_bow.fastq -o /data/kdelany/compBio_minProject/SpadesAssembly/'
+    with open('miniproject.log', 'a') as f:
+        f.write(str(spades_cmd))
+        f.close()
+
+
+
 def main():
     """ Takes in SRR id number arguments in command line and runs through"""
     
@@ -140,11 +149,23 @@ def main():
 
 #    SleuthInput()
 ##still have to run R code in command line
-
+    
+    SRRs = []
     for i in args.SRR:
        # bowtie2build(i)
         Sam2Fastq(i)
         getNumReads(i)
+        SRRs.append(i)
+
+    SPAdes(SRRs)
+
+
+  
+
+
+
+
+
     
 if __name__ == '__main__':
     main()
