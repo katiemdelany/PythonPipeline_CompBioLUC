@@ -88,6 +88,7 @@ def Sam2Fastq(SRR):
 def getNumReads(SRR):
     """ Returns the number of reads before bowtie2 and after """
     name = ''
+    #tells which donor to write into log file
     if SRR == 'SRR5660030':
         name = 'Donor 1 (2dpi)'
     elif SRR == 'SRR5660033':
@@ -98,10 +99,12 @@ def getNumReads(SRR):
         name = 'Donor 3 (6dpi)'
     SRRfile = open(str(SRR)+'_1.fastq')
     count1 = 0
+    #count reads in SRR file before bowtie
     for line in SRRfile:
         count1+=1
     beforeCount = count1/4
     AfterFile = open(str(SRR)+'_bow.fastq')
+    #count reads after bowtie mapping
     count2 = 0
     for line in AfterFile:
         count2 +=1
@@ -116,14 +119,12 @@ def main():
     
     parser = argparse.ArgumentParser(description= 'Process SRR (RunID) numbers')
     parser.add_argument('SRR', metavar= 'N', type=str, nargs = '+', help = 'SRRs')
-    parser.add_argument('--downloadfiles', help='Retrieve SRA from database and convert to paired-end fastq files')
     args = parser.parse_args()
 
     
     
-#    if args.downloadfiles:
-#        for i in args.SRR:
-#            InptFiles(i)
+#    for i in args.SRR:
+#       InptFiles(i)
 #    with open('miniproject.log', 'a') as f_out:
 #        f_out.write('SRA files download done.')
 #        f_out.close()
