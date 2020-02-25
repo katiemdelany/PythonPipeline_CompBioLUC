@@ -70,6 +70,35 @@ def SleuthInput():
     covFile.close()
 
 
+def bowtie2build(SRR):
+    """ Builds a Bowtie index for HCMV """
+    build_cmd = 'bowtie2-build ./EF999921.fasta EF999921'
+    os.system(build_cmd)
+    bowtie_cmd = 'bowtie2 --quiet --no-unal -x EF999921 -1 '+SRR+'_1.fastq -2'+SRR+'_2.fastq -S '+SRR+ '.sam'
+    os.system(bowtie_cmd)
+
+
+
+def Sam2Fastq(SRR):
+    convert_cmd = 'cat ' + str(SRR)+'.sam | grep -v ^@ | awk {print "@"$1"\n"$10"\n+\n"$11} >'+ SRR+ '_bow.fastq'
+    os.system(convert_cmd)
+
+def getNumReads(SRR):
+    SRRfile = open(str(SRR)+'_1.fastq')
+    count1 = 0
+    for line in SRRfile:
+        count1+=1
+    beforeCount = count/4
+    AfterFile = open(str(SRR)+'_bow.fastq')
+    count2 = 0
+    for line in AfterFile:
+        count2 +=1
+    afterCount = count2/4
+#### need to fix this
+#    with open('miniproject.log', 'a') as f:
+#        f.write("Donor () had " +str(beforeCount) + " read pairs before Bowtie2 filtering and "+ str(AfterCount)+" pairs after.")
+#        f.close()
+
 
 def main():
     """ Takes in SRR id number arguments in command line and runs through"""
@@ -87,19 +116,23 @@ def main():
 #    with open('miniproject.log', 'a') as f_out:
 #        f_out.write('SRA files download done.')
 #        f_out.close()
-    result =  getTranscriptomeIndex()
-    with open('miniproject.log', 'a') as f_out:
-        f_out.write('The HCMV genome (EF999921) has ' + str(result) + ' CDS.')
-        f_out.close()
+#    result =  getTranscriptomeIndex()
+#    with open('miniproject.log', 'a') as f_out:
+#        f_out.write('The HCMV genome (EF999921) has ' + str(result) + ' CDS.')
+#        f_out.close()
 
     
 
 #    for i in args.SRR:
 #        Kallisto(i)
 
+#    SleuthInput()
+##still have to run R code in command line
 
-
-    SleuthInput()
+    for i in args.SRR:
+        bowtie2build(i)
+        Sam2Fastq(i)
+        getNumReads(i)
     
 if __name__ == '__main__':
     main()
