@@ -120,11 +120,15 @@ def getNumReads(SRR):
     else:
         name = 'Donor 3 (6dpi)'
     SRRfile = open(str(SRR)+'_1.fastq')
+    SRRfile1 = open(str(SRR)+'_2.fastq')
     count1 = 0
+    count = 0
     #count reads in SRR file before bowtie
     for line in SRRfile:
         count1+=1
-    beforeCount = count1/4
+    for line in SRRfile1:
+        count+=1               
+    beforeCount =(count+ count1)/4
     AfterFile = open(str(SRR)+'_bow.fastq')
     #count reads after bowtie mapping
     count2 = 0
