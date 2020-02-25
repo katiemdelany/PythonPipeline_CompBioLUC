@@ -10,13 +10,16 @@ This repository contains Python code from the Comp Bio Mini Project. Project foc
 * SPAdes
 ### Main Python Script
 #### miniMain.py
-To run the main script from the linux command line:
+Argument format: SRR run ID numbers
 ```
-python3 miniMain.py SRR5660030 SRR5660033 SRR5660044 SRR5660045
+<SRR Run ID> <SRR Run ID> <SRR Run ID> <SRR Run ID>
 ```
-Arguments are the SRR run ID numbers. 
+Example:
+```
+python3 miniMain.py SRR5660033 SRR5660033 SRR5660044 SRR5660045
+```
 
-### Files Included:
+### Files Included in Repo:
 #### miniMain.py: 
 miniMain.py runs the whole pipeline and contains helper function to complete each step. It outputs files to multiple folders and writes into a .log file to record key results.
 #### transcriptIdx.py:
