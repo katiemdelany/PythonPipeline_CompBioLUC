@@ -1,5 +1,9 @@
 import os
+import shlex
+import subprocess
+import logging
 import argparse
+import pathlib
 from Bio import SeqIO
 from Bio import Entrez
 from Bio import SearchIO
@@ -7,6 +11,16 @@ from Bio.Seq import Seq
 from Bio.Blast import NCBIWWW
 curr =  os.getcwd()
 os.chdir(curr)
+
+
+def arg_parser():
+    parser = argparse.ArgumentParser(description='some description')
+    parser.add_argument('srrfiles', metavar= '.srr', type=str, nargs = '*', help = 'SRRs')
+
+    return parser.parse_args()
+
+
+
 
 def InptFiles(SRR):
     """
@@ -21,6 +35,14 @@ def InptFiles(SRR):
     #os.system(getFiles)
     os.system(renameFile)
     os.system(splitFiles)
+
+    rename_file_cmd = shlex.split('mv {}.1 {}'.format(SRR, SRR))
+    with open('mv_cmd_log.txt', 'ab+') as mv_out:
+        subprocess.run(rename_file_cmd, stdout=mv_out, stderr=mv_out)
+
+    split_files_cmd = shlex.split('fastq-dump -I --split-files {}'.format(SRR))
+    with open('fastq_dump_output.txt', 'ab+') as fastq_dump_out:
+        subprocess.run(split_files_cmd, stdout=fastq_dump_out, stderr=fastq_dump_out)
 
 def getTranscriptomeIndex():
     outFasta = open("EF999921.fasta", "w")
@@ -111,7 +133,7 @@ def getNumReads(SRR):
     afterCount = count2/4
 
     with open('miniproject.log', 'a') as f:
-        f.write(str(name)+' had ' +str(beforeCount) + ' read pairs before Bowtie2 filtering and '+ str(afterCount)+' pairs after.')
+        f.write(str(name)+' had ' +str(beforeCount) + ' read pairs before Bowtie2 filtering and '+ str(afterCount)+' pairs after.\n')
         f.close()
 
         
@@ -140,27 +162,32 @@ def numContigs():
         f.write('There are '+str(count)+ ' contigs > 1000 bp in the assembly.' + '\n')
         f.close()
         
-def countAssembly(afile):
+def countAssembly():
     newFile = open('LargeContigs.txt', 'r')
+    assemblyFile = open('Assembly.txt','w')
     handle = SeqIO.parse('LargeContigs.txt', 'fasta')
     lenList = []
+    assemblyFile.write('>Assembly Fasta\n')
     for record in handle:
         m = len(record.seq)
         lenList.append(int(m))
+        assemblyFile.write(str(record.seq)+ 'NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN')
+    assemblyFile.close()    
     total = sum(lenList)
     with open('miniproject.log','a') as f:
         f.write('There are '+str(total)+' bp in the assembly.\n')
         f.close()
 
-
 def main():
     """ Takes in SRR id number arguments in command line and runs through"""
     
-    parser = argparse.ArgumentParser(description= 'Process SRR (RunID) numbers')
-    parser.add_argument('SRR', metavar= 'N', type=str, nargs = '+', help = 'SRRs')
-    args = parser.parse_args()
-
+    # parser = argparse.ArgumentParser(description= 'Process SRR (RunID) numbers')
+    # parser.add_argument('SRR', metavar= 'N', type=str, nargs = '+', help = 'SRRs')
+    args = arg_parser()
     
+    logging.info('SRA values: %s', args.srrfiles)
+
+    print(args.srrfiles)
     
 #    for i in args.SRR:
 #       InptFiles(i)
@@ -188,7 +215,7 @@ def main():
 #        SRRs.append(i)
 #    SPAdes(SRRs)
 
-    numContigs()
+#    numContigs()
 
   
 
@@ -198,4 +225,7 @@ def main():
 
     
 if __name__ == '__main__':
+    logger = logging.getLogger(__name__)
+    logFormatter = '%(levelname)s:%(name)s:%(asctime)s:%(message)s'
+    logging.basicConfig(filename='some_log.log', format=logFormatter, level=logging.DEBUG)
     main()
