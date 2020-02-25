@@ -116,11 +116,41 @@ def getNumReads(SRR):
 
         
 def SPAdes(SRRs):
-    spades_cmd = 'spades -k 55,77,88,127, -t 2 -s ' +SRRs[0]+ '_bow.fastq ' + SRRs[1]+'_bow.fastq ' SRRs[2]+ '_bow.fastq '+ SRRs[3] + '_bow.fastq -o /data/kdelany/compBio_minProject/SpadesAssembly/'
+    SRR1= SRRs[0]
+    SRR2= SRRs[1]
+    SRR3= SRRs[2]
+    SRR4= SRRs[3]
+    spades_cmd = 'spades -k 55,77,99,127 -t 2 -s '+SRR1+'_bow.fastq -s '+SRR2+'_bow.fastq -s '+SRR3+ '_bow.fastq -s '+SRR4 + '_bow.fastq -o SpadesAssembly/'
+    os.system(spades_cmd)
     with open('miniproject.log', 'a') as f:
-        f.write(str(spades_cmd))
+        f.write(str(spades_cmd)+ '\n')
         f.close()
-
+    
+def numContigs():
+    newFile = open('LargeContigs.txt', 'w')
+    count = 0
+    handle = SeqIO.parse('./SpadesAssembly/contigs.fasta','fasta')
+    for record in handle:
+        m = len(record.seq)
+        if m > 1000:
+            count +=1
+            newFile.write(str(record.id) + '\n' + str(record.seq) + '\n')
+    newFile.close()
+    with open('miniproject.log', 'a') as f:
+        f.write('There are '+str(count)+ ' contigs > 1000 bp in the assembly.' + '\n')
+        f.close()
+        
+def countAssembly(afile):
+    newFile = open('LargeContigs.txt', 'r')
+    handle = SeqIO.parse('LargeContigs.txt', 'fasta')
+    lenList = []
+    for record in handle:
+        m = len(record.seq)
+        lenList.append(int(m))
+    total = sum(lenList)
+    with open('miniproject.log','a') as f:
+        f.write('There are '+str(total)+' bp in the assembly.\n')
+        f.close()
 
 
 def main():
@@ -151,14 +181,14 @@ def main():
 ##still have to run R code in command line
     
     SRRs = []
-    for i in args.SRR:
+#    for i in args.SRR:
        # bowtie2build(i)
-        Sam2Fastq(i)
-        getNumReads(i)
-        SRRs.append(i)
+#        Sam2Fastq(i)
+#        getNumReads(i)
+#        SRRs.append(i)
+#    SPAdes(SRRs)
 
-    SPAdes(SRRs)
-
+    numContigs()
 
   
 
