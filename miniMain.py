@@ -78,27 +78,38 @@ def bowtie2build(SRR):
     os.system(bowtie_cmd)
 
 
-
 def Sam2Fastq(SRR):
-    convert_cmd = 'cat ' + str(SRR)+'.sam | grep -v ^@ | awk {print "@"$1"\n"$10"\n+\n"$11} >'+ SRR+ '_bow.fastq'
-    os.system(convert_cmd)
+    """ Bash script to convert sam files to fastq files """
+    runConvert = 'bash samtofastq.sh ' + str(SRR)
+    os.system(runConvert)
+
+
 
 def getNumReads(SRR):
+    """ Returns the number of reads before bowtie2 and after """
+    name = ''
+    if SRR == 'SRR5660030':
+        name = 'Donor 1 (2dpi)'
+    elif SRR == 'SRR5660033':
+        name = 'Donor 1 (6dpi)'
+    elif SRR == 'SRR5660044':
+        name = 'Donor 3 (2dpi)'
+    else:
+        name = 'Donor 3 (6dpi)'
     SRRfile = open(str(SRR)+'_1.fastq')
     count1 = 0
     for line in SRRfile:
         count1+=1
-    beforeCount = count/4
+    beforeCount = count1/4
     AfterFile = open(str(SRR)+'_bow.fastq')
     count2 = 0
     for line in AfterFile:
         count2 +=1
     afterCount = count2/4
-#### need to fix this
-#    with open('miniproject.log', 'a') as f:
-#        f.write("Donor () had " +str(beforeCount) + " read pairs before Bowtie2 filtering and "+ str(AfterCount)+" pairs after.")
-#        f.close()
 
+    with open('miniproject.log', 'a') as f:
+        f.write(str(name)+' had ' +str(beforeCount) + ' read pairs before Bowtie2 filtering and '+ str(afterCount)+' pairs after.')
+        f.close()
 
 def main():
     """ Takes in SRR id number arguments in command line and runs through"""
@@ -130,7 +141,7 @@ def main():
 ##still have to run R code in command line
 
     for i in args.SRR:
-        bowtie2build(i)
+       # bowtie2build(i)
         Sam2Fastq(i)
         getNumReads(i)
     
