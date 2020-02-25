@@ -8,8 +8,15 @@ This repository contains Python code from the Comp Bio Mini Project. Project foc
 * Kallisto
 * Bowtie2
 * SPAdes
+### Main Python Script
+#### miniMain.py
+To run the main script from the linux command line:
+```
+python3 miniMain.py SRR5660030 SRR5660033 SRR5660044 SRR5660045
+```
+Arguments are the SRR run ID numbers. 
 
-### Files:
+### Files Included:
 #### miniMain.py: 
 miniMain.py runs the whole pipeline and contains helper function to complete each step. It outputs files to multiple folders and writes into a .log file to record key results.
 #### transcriptIdx.py:
@@ -18,5 +25,6 @@ This was used for development of the helper function used to retrieve and genera
 This takes the output from Kallisto and creates a tab-delimited input file for sleuth. 
 #### samtofastq.sh
 A bash shell script that converts sam files from Bowtie2 to fastq files to be used in SPAdes
+
 
 
