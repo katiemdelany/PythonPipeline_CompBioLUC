@@ -36,13 +36,13 @@ def InptFiles(SRR):
     os.system(renameFile)
     os.system(splitFiles)
 
-    rename_file_cmd = shlex.split('mv {}.1 {}'.format(SRR, SRR))
-    with open('mv_cmd_log.txt', 'ab+') as mv_out:
-        subprocess.run(rename_file_cmd, stdout=mv_out, stderr=mv_out)
+#    rename_file_cmd = shlex.split('mv {}.1 {}'.format(SRR, SRR))
+#    with open('mv_cmd_log.txt', 'ab+') as mv_out:
+#        subprocess.run(rename_file_cmd, stdout=mv_out, stderr=mv_out)
 
-    split_files_cmd = shlex.split('fastq-dump -I --split-files {}'.format(SRR))
-    with open('fastq_dump_output.txt', 'ab+') as fastq_dump_out:
-        subprocess.run(split_files_cmd, stdout=fastq_dump_out, stderr=fastq_dump_out)
+#    split_files_cmd = shlex.split('fastq-dump -I --split-files {}'.format(SRR))
+#    with open('fastq_dump_output.txt', 'ab+') as fastq_dump_out:
+#        subprocess.run(split_files_cmd, stdout=fastq_dump_out, stderr=fastq_dump_out)
 
 def getTranscriptomeIndex():
     outFasta = open("EF999921.fasta", "w")
@@ -62,6 +62,7 @@ def getTranscriptomeIndex():
                     outFile.write('>' + str(feature.qualifiers['protein_id']).replace('[', '').replace(']', '').replace("'","") + '\n' + str(feature.location.extract(record).seq) +'\n')                
     outFile.close()
     return(count)
+
 
 
 def Kallisto(SRR):
@@ -92,12 +93,14 @@ def SleuthInput():
     covFile.close()
 
 
+
 def bowtie2build(SRR):
     """ Builds a Bowtie index for HCMV """
     build_cmd = 'bowtie2-build ./EF999921.fasta EF999921'
     os.system(build_cmd)
     bowtie_cmd = 'bowtie2 --quiet --no-unal -x EF999921 -1 '+SRR+'_1.fastq -2'+SRR+'_2.fastq -S '+SRR+ '.sam'
     os.system(bowtie_cmd)
+
 
 
 def Sam2Fastq(SRR):
@@ -136,22 +139,22 @@ def getNumReads(SRR):
         count2 +=1
     afterCount = count2/4
 
-    with open('miniproject.log', 'a') as f:
-        f.write(str(name)+' had ' +str(beforeCount) + ' read pairs before Bowtie2 filtering and '+ str(afterCount)+' pairs after.\n')
-        f.close()
+    logging.info(str(name)+' had ' +str(beforeCount) + ' read pairs before Bowtie2 filtering and '+ str(afterCount)+' pairs after').
 
-        
+
+
 def SPAdes(SRRs):
     SRR1= SRRs[0]
     SRR2= SRRs[1]
     SRR3= SRRs[2]
     SRR4= SRRs[3]
-    spades_cmd = 'spades -k 55,77,99,127 -t 2 -s '+SRR1+'_bow.fastq -s '+SRR2+'_bow.fastq -s '+SRR3+ '_bow.fastq -s '+SRR4 + '_bow.fastq -o SpadesAssembly/'
+    spades_cmd = 'spades -k 55,77,99,127 -t 2 --only-assembler -s '+SRR1+'_bow.fastq -s '+SRR2+'_bow.fastq -s '+SRR3+ '_bow.fastq -s '+SRR4 + '_bow.fastq -o SpadesAssembly/'
     os.system(spades_cmd)
-    with open('miniproject.log', 'a') as f:
-        f.write(str(spades_cmd)+ '\n')
-        f.close()
-    
+   
+   logging.info(str(spades_cmd))
+
+
+
 def numContigs():
     newFile = open('LargeContigs.txt', 'w')
     count = 0
@@ -160,27 +163,29 @@ def numContigs():
         m = len(record.seq)
         if m > 1000:
             count +=1
-            newFile.write(str(record.id) + '\n' + str(record.seq) + '\n')
+            newFile.write('> '+str(record.id) + '\n' + str(record.seq) + '\n')
     newFile.close()
-    with open('miniproject.log', 'a') as f:
-        f.write('There are '+str(count)+ ' contigs > 1000 bp in the assembly.' + '\n')
-        f.close()
-        
+
+    logging.info('There are '+str(count)+' contigs > 1000 bp in the assembly.')
+
+
+
 def countAssembly():
     newFile = open('LargeContigs.txt', 'r')
     assemblyFile = open('Assembly.txt','w')
     handle = SeqIO.parse('LargeContigs.txt', 'fasta')
     lenList = []
-    assemblyFile.write('>Assembly Fasta\n')
+    #assemblyFile.write('>Assembly Fasta\n')
     for record in handle:
         m = len(record.seq)
         lenList.append(int(m))
         assemblyFile.write(str(record.seq)+ 'NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN')
     assemblyFile.close()    
-    total = sum(lenList)
-    with open('miniproject.log','a') as f:
-        f.write('There are '+str(total)+' bp in the assembly.\n')
-        f.close()
+    total = sum(lenList) 
+   
+   logging.info('There are '+str(total)+' bp in the assembly.')
+
+
 
 def main():
     """ Takes in SRR id number arguments in command line and runs through"""
@@ -199,9 +204,8 @@ def main():
 #        f_out.write('SRA files download done.')
 #        f_out.close()
 #    result =  getTranscriptomeIndex()
-#    with open('miniproject.log', 'a') as f_out:
-#        f_out.write('The HCMV genome (EF999921) has ' + str(result) + ' CDS.')
-#        f_out.close()
+#    logging.info('The HCMV genome (EF999921) has '+str(result))
+
 
     
 
@@ -219,8 +223,8 @@ def main():
 #        SRRs.append(i)
 #    SPAdes(SRRs)
 
-#    numContigs()
-
+    numContigs()
+    countAssembly()
   
 
 
@@ -230,6 +234,6 @@ def main():
     
 if __name__ == '__main__':
     logger = logging.getLogger(__name__)
-    logFormatter = '%(levelname)s:%(name)s:%(asctime)s:%(message)s'
+    logFormatter = '%(message)s'
     logging.basicConfig(filename='some_log.log', format=logFormatter, level=logging.DEBUG)
     main()
