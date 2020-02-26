@@ -200,10 +200,13 @@ def blast():
     outhandle.close()
     qresult = SearchIO.read('my_blast.xml','blast-xml')
     logging.info('seq_title\talign_len\tnumber_HSPs\ttopHSP_ident\ttopHSP_gaps\ttopHSP_bits\ttopHSP_expect')
+    m = len(qresult)
     top_ten = 9
+    if top_ten > m:
+        top_ten = m
     for i in range(0, top_ten):
         res = qresult[i]
-        hsp1 = blast_record[i][0]
+        hsp1 = qresult[i][0]
         seq_title = str(res.description)
         align_len = str(res.seq_len)
         number_HSPs = str(len(res.hsps))
@@ -231,8 +234,6 @@ def main():
     result =  getTranscriptomeIndex()
     logging.info('The HCMV genome (EF999921) has '+str(result))
 
-
-    
 
     for i in args.srrfiles:
         Kallisto(i)
