@@ -11,7 +11,7 @@ os.chdir(curr)
 
 
 def arg_parser():
-    parser = argparse.ArgumentParser(description='some description')
+    parser = argparse.ArgumentParser(description='Evaluate sra files')
     parser.add_argument('srrfiles', metavar= '.srr', type=str, nargs = '*', help = 'SRRs')
 
     return parser.parse_args()
@@ -152,8 +152,8 @@ def SPAdes(SRRs):
     SRR3= SRRs[2]
     SRR4= SRRs[3]
    # spades_cmd = 'spades -k 55,77,99,127 -t 2 --only-assembler -s BOW_'+SRR1+'.1.fastq -s '+SRR2+'_bow.fastq -s '+SRR3+ '_bow.fastq -s '+SRR4 + '_bow.fastq -o SpadesAssembly/'
-    spades_cmd = 'spades -k 55,77,99,127 --only-assembly -t 2 --pe1-1 BOW_'+SRR1+'.1.fastq --pe1-2 BOW_'+SRR1+'.2.fastq --pe2-1 BOW_'+SRR2+'.1.fastq --pe2-2 BOW_'+SRR2+'.2.fastq --pe3-1 BOW_'+SRR3+'.1.fastq --pe3-2 BOW_'+SRR3+'.2.fastq --pe4-1 BOW_'+SRR4+'.1.fastq --pe4-2 BOW_'+SRR4+'.2.fastq -o SpadesAssembly/'
-    os.system(spades_cmd)
+   
+    spades_cmd = 'spades -k 55,77,99,127 -t 2 --only-assembler --pe1-1 BOW_'+SRR1+'.1.fastq --pe1-2 BOW_'+SRR1+'.2.fastq --pe2-1 BOW_'+SRR2+'.1.fastq --pe2-2 BOW_'+SRR2+'.2.fastq --pe3-1 BOW_'+SRR3+'.1.fastq --pe3-2 BOW_'+SRR3+'.2.fastq --pe4-1 BOW_'+SRR4+'.1.fastq --pe4-2 BOW_'+SRR4+'.2.fastq -o SpadesAssembly/'                                                                                                                                  os.system(spades_cmd)
    
     logging.info(str(spades_cmd))
 
@@ -264,5 +264,5 @@ def main():
 if __name__ == '__main__':
     logger = logging.getLogger(__name__)
     logFormatter = '%(message)s'
-    logging.basicConfig(filename='some_log.log', format=logFormatter, level=logging.DEBUG)
+    logging.basicConfig(filename='miniProject.log', format=logFormatter, level=logging.DEBUG)
     main()
