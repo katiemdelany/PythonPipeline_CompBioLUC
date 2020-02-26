@@ -237,7 +237,7 @@ def main():
 #       InptFiles(i)
 
     result =  getTranscriptomeIndex()
-    logging.info('The HCMV genome (EF999921) has CDS.'+str(result))
+    logging.info('The HCMV genome (EF999921) has '+str(result)+' CDS.')
 
 
     for i in args.srrfiles:
