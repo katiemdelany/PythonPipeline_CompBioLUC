@@ -236,11 +236,9 @@ def assembleContigs():
 
 
 def blast():
-    print("BLAST")
     inFile = open('Assemble.fasta').read()
     #blast command with added entrez_query to limit search
     blast1 = NCBIWWW.qblast('blastn','nr',inFile, entrez_query='"Herpesviridae"[organism]')
-    print(blast1.read())
     with open("my_blast.xml", "w") as outhandle:
         outhandle.write(blast1.read())
     blast1.close()
