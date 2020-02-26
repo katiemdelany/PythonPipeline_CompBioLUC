@@ -236,11 +236,12 @@ def assembleContigs():
 
 
 def blast():
-    """ Runs Blast on file with large contigs concatenated """
+    print("BLAST")
     inFile = open('Assemble.fasta').read()
     #blast command with added entrez_query to limit search
     blast1 = NCBIWWW.qblast('blastn','nr',inFile, entrez_query='"Herpesviridae"[organism]')
-    with open('my_blast.xml', 'w') as outhandle:
+    print(blast1.read())
+    with open("my_blast.xml", "w") as outhandle:
         outhandle.write(blast1.read())
     blast1.close()
     outhandle.close()
@@ -303,11 +304,10 @@ def main():
         getNumReads(i)
         
     SPAdes(args.srrfiles)
-
     numContigs()
     countContigs()
     assembleContigs()
-    blast()  
+    blast()
     
 
 if __name__ == '__main__':
