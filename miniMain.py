@@ -242,6 +242,7 @@ def blast():
     blast1 = NCBIWWW.qblast('blastn','nr',inFile, entrez_query='Herpesviridae [Organism]')
     with open('my_blast.xml', 'w') as outhandle:
         outhandle.write(blast1.read())
+    blast1.close()
     outhandle.close()
     #parse output
     qresult = SearchIO.read('my_blast.xml','blast-xml')
