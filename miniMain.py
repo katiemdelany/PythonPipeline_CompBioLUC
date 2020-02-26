@@ -34,9 +34,6 @@ def InptFiles(SRR):
 
 
 def getTranscriptomeIndex():
-   """ This is used to generate a genome fasta and CDS fasta from HCMV NCBI accession
-       EF999921. 
-   """
     outFasta = open("EF999921.fasta", "w")
     outFile = open("EF999921_CDS.fasta","w")
     Entrez.email = 'kdelany@luc.edu'
