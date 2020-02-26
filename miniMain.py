@@ -123,7 +123,7 @@ def getNumReads(SRR):
     #before running Bowtie2
     SRRfile = open(str(SRR)+'_1.fastq')
     SRRfile1 = open(str(SRR)+'_2.fastq')
-     count1 = 0
+    count1 = 0
     count = 0
     #count reads in SRR file before bowtie
     for line in SRRfile:
