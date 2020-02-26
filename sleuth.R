@@ -1,6 +1,6 @@
 library(sleuth)
 library(data.table)
-setwd("/data/kdelany/compBio_miniProject")
+#setwd("/data/kdelany/compBio_miniProject")
 
 ##TABLE
 stab <- read.table("cov.txt", header=TRUE, stringsAsFactors = FALSE, sep='\t')
