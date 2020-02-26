@@ -1,9 +1,6 @@
 import os
-import shlex
-import subprocess
 import logging
 import argparse
-import pathlib
 from Bio import SeqIO
 from Bio import Entrez
 from Bio import SearchIO
@@ -97,7 +94,7 @@ def Sleuth():
 
 def bowtie2build(SRR):
     """ Builds a Bowtie index for HCMV """
-    build_cmd = 'bowtie2-build ./EF999921.fasta HCMV'
+    build_cmd = 'bowtie2-build ./EF999921_CDS.fasta HCMV'
     os.system(build_cmd)
     bowtie_cmd = 'bowtie2 --quiet --no-unal -x --al-conc HCMV -1 '+SRR+'_1.fastq -2'+SRR+'_2.fastq -S '+SRR+ '.sam'
     os.system(bowtie_cmd)
@@ -201,19 +198,20 @@ def blast():
     with open('my_blast.xml', 'w') as outhandle:
         outhandle.write(blast1.read())
     outhandle.close()
-    blast_record = SearchIO.read('my_blast.xml','blast-xml')
-    addResult = ''
+    qresult = SearchIO.read('my_blast.xml','blast-xml')
     logging.info('seq_title\talign_len\tnumber_HSPs\ttopHSP_ident\ttopHSP_gaps\ttopHSP_bits\ttopHSP_expect')
-    for alignment in blast_record.alignments:
-        for hsp in alignment.hsps:
-            seq_title = str(hsp.id)
-            align_len = str(hsp.seq_len)
-            number_HSPs = str(len(hsp.hsps))
-            topHSP_ident = str(hsp.ident_num)
-            topHSP_gaps = str(gap_num)
-            topHSP_bits = str(hsp.bitscore)
-            topHSP_expect = str(hsp.evalue)
-            logging.info(seq_title + '\t' + align_len+ '\t'+ number_HSPs+ '\t'+topHSP_ident+ '\t'+ topHSP_gaps+ '\t'+ topHSP_bits+ '\t'+ topHSP_expect)
+    top_ten = 9
+    for i in range(0, top_ten):
+        res = qresult[i]
+        hsp1 = blast_record[i][0]
+        seq_title = str(res.description)
+        align_len = str(res.seq_len)
+        number_HSPs = str(len(res.hsps))
+        topHSP_ident = str(hsp1.ident_num)
+        topHSP_gaps = str(hsp1.gap_num)
+        topHSP_bits = str(hsp1.bitscore)
+        topHSP_expect = str(hsp1.evalue)
+        logging.info(seq_title + '\t' + align_len+ '\t'+ number_HSPs+ '\t'+topHSP_ident+ '\t'+ topHSP_gaps+ '\t'+ topHSP_bits+ '\t'+ topHSP_expect)
 
 
 
