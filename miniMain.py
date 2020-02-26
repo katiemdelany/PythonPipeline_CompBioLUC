@@ -94,9 +94,9 @@ def Sleuth():
 
 def bowtie2build(SRR):
     """ Builds a Bowtie index for HCMV """
-    build_cmd = 'bowtie2-build ./EF999921_CDS.fasta HCMV'
+    build_cmd = 'bowtie2-build ./EF999921_CDS.fasta EF999921'
     os.system(build_cmd)
-    bowtie_cmd = 'bowtie2 --quiet --no-unal -x --al-conc HCMV -1 '+SRR+'_1.fastq -2'+SRR+'_2.fastq -S '+SRR+ '.sam'
+    bowtie_cmd = 'bowtie2 --quiet --no-unal --al-conc BOW_'+SRR+'.fastq -x EF999921 -1 '+SRR+ '_1.fastq -2'+SRR+'_2.fastq -S '+SRR+ '.sam'
     os.system(bowtie_cmd)
 
 
@@ -120,9 +120,10 @@ def getNumReads(SRR):
         name = 'Donor 3 (2dpi)'
     else:
         name = 'Donor 3 (6dpi)'
+    #before running Bowtie2
     SRRfile = open(str(SRR)+'_1.fastq')
     SRRfile1 = open(str(SRR)+'_2.fastq')
-    count1 = 0
+     count1 = 0
     count = 0
     #count reads in SRR file before bowtie
     for line in SRRfile:
@@ -130,12 +131,16 @@ def getNumReads(SRR):
     for line in SRRfile1:
         count+=1               
     beforeCount =(count+ count1)/4
-    AfterFile = open(str(SRR)+'_bow.fastq')
+    AfterFile1 = open('BOW_'+SRR+'.1.fastq')
+    AfterFile2 = open('BOW_'+SRR+'.2.fastq')
     #count reads after bowtie mapping
     count2 = 0
-    for line in AfterFile:
+    count3 = 0
+    for line in AfterFile1:
         count2 +=1
-    afterCount = count2/4
+    for line in AfterFile2:
+        count3 +=1
+    afterCount =(count3+ count2)/4
 
     logging.info(str(name)+' had ' +str(beforeCount) + ' read pairs before Bowtie2 filtering and '+ str(afterCount)+' pairs after.')
 
@@ -146,8 +151,9 @@ def SPAdes(SRRs):
     SRR2= SRRs[1]
     SRR3= SRRs[2]
     SRR4= SRRs[3]
-    spades_cmd = 'spades -k 55,77,99,127 -t 2 --only-assembler -s '+SRR1+'_bow.fastq -s '+SRR2+'_bow.fastq -s '+SRR3+ '_bow.fastq -s '+SRR4 + '_bow.fastq -o SpadesAssembly/'
-    os.system(spades_cmd)
+   # spades_cmd = 'spades -k 55,77,99,127 -t 2 --only-assembler -s BOW_'+SRR1+'.1.fastq -s '+SRR2+'_bow.fastq -s '+SRR3+ '_bow.fastq -s '+SRR4 + '_bow.fastq -o SpadesAssembly/'
+    spades_cmd = 'spades -k 55,77,99,127 --only-assembly -t 2 --pe1-1 BOW_'+SRR1+'.1.fastq --pe1-2 BOW_'+SRR1+'.2.fastq --pe2-1 BOW_'+SRR2+'.1.fastq --pe2-2 BOW_'+SRR2+'.2.fastq --pe3-1 BOW_'+SRR3+'.1.fastq --pe3-2 BOW_'+SRR3+'.2.fastq --pe4-1 BOW_'+SRR4+'.1.fastq --pe4-2 BOW_'+SRR4+'.2.fastq -o SpadesAssembly/'
+   os.system(spades_cmd)
    
     logging.info(str(spades_cmd))
 
@@ -244,7 +250,7 @@ def main():
     
     for i in args.srrfiles:
         bowtie2build(i)
-        Sam2Fastq(i)
+       # Sam2Fastq(i)
         getNumReads(i)
         
     SPAdes(args.srrfiles)
