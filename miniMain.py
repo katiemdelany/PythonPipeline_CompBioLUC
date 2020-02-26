@@ -153,7 +153,7 @@ def SPAdes(SRRs):
     SRR4= SRRs[3]
    # spades_cmd = 'spades -k 55,77,99,127 -t 2 --only-assembler -s BOW_'+SRR1+'.1.fastq -s '+SRR2+'_bow.fastq -s '+SRR3+ '_bow.fastq -s '+SRR4 + '_bow.fastq -o SpadesAssembly/'
     spades_cmd = 'spades -k 55,77,99,127 --only-assembly -t 2 --pe1-1 BOW_'+SRR1+'.1.fastq --pe1-2 BOW_'+SRR1+'.2.fastq --pe2-1 BOW_'+SRR2+'.1.fastq --pe2-2 BOW_'+SRR2+'.2.fastq --pe3-1 BOW_'+SRR3+'.1.fastq --pe3-2 BOW_'+SRR3+'.2.fastq --pe4-1 BOW_'+SRR4+'.1.fastq --pe4-2 BOW_'+SRR4+'.2.fastq -o SpadesAssembly/'
-   os.system(spades_cmd)
+    os.system(spades_cmd)
    
     logging.info(str(spades_cmd))
 
