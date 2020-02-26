@@ -239,7 +239,7 @@ def blast():
     """ Runs Blast on file with large contigs concatenated """
     inFile = open('Assemble.fasta').read()
     #blast command with added entrez_query to limit search
-    blast1 = NCBIWWW.qblast('blastn','nr',inFile, entrez_query='10292[taxid]')
+    blast1 = NCBIWWW.qblast('blastn','nr',inFile, entrez_query='Herpesviridae [Organism]')
     with open('my_blast.xml', 'w') as outhandle:
         outhandle.write(blast1.read())
     outhandle.close()
