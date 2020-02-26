@@ -34,16 +34,23 @@ def InptFiles(SRR):
 
 
 def getTranscriptomeIndex():
+   """ This is used to generate a genome fasta and CDS fasta from HCMV NCBI accession
+       EF999921. 
+   """
     outFasta = open("EF999921.fasta", "w")
     outFile = open("EF999921_CDS.fasta","w")
     Entrez.email = 'kdelany@luc.edu'
+    #retrieve record
     handle = Entrez.efetch(db = 'nucleotide', id= 'EF999921', rettype= 'fasta')
     records = list(SeqIO.parse(handle, "fasta"))
+    #use .seq object to write out fasta file of whole sequence
     outFasta.write('>' + str(records[0].description)+ '\n' + str(records[0].seq))
     outFasta.close()
-    #SeqIO.write(records[0], 'EF999921.fasta', 'fasta')
+    #Fetch genbank format object
     GBhandle = Entrez.efetch(db = 'nucleotide', id = 'EF999921', rettype= 'gb', retmode='text')
     count = 0
+    #this writes out the CDS sequences with a >identifier to a new file 
+    #also adds a count for recording number of CDS sequences
     for record in SeqIO.parse(GBhandle, 'genbank'):
             for feature in record.features:
                 if feature.type == "CDS":
@@ -67,12 +74,18 @@ def Kallisto(SRR):
 
 
 
-def SleuthInput():
-    SRRs = 'SRR5660030','SRR5660033','SRR5660044','SRR5660045'
+def SleuthInput(SRRs):
+    """
+    Create file for input into sleuth
+    
+    """
+    #input file for sleuth
     covFile = open('cov.txt','w')
     condition1 = "2dpi"
     condition2 = "6dpi"
+    #initial line in file
     covFile.write('sample'+ '\t' + 'condition' + '\t' + 'path' + '\n')
+    #based on SRR number, write condition and path to input file
     for i in SRRs:
         path = '/data/kdelany/compBio_miniProject/'+i
         if int(i[3:])%2==0:
@@ -83,6 +96,11 @@ def SleuthInput():
 
 
 def Sleuth():
+    """
+    Runs sleuth in R
+    Reads sleuth output and adds to log file
+
+    """
     runSleuth = 'Rscript sleuth.R'
     os.system(runSleuth)
     output = open('topten.txt','r')
@@ -147,6 +165,9 @@ def getNumReads(SRR):
 
 
 def SPAdes(SRRs):
+    """
+    Sets SRRs to separate variables
+    """
     SRR1= SRRs[0]
     SRR2= SRRs[1]
     SRR3= SRRs[2]
@@ -159,9 +180,16 @@ def SPAdes(SRRs):
 
 
 def numContigs():
+    """
+    Counts number of contigs greater than 100
+
+    """
     newFile = open('LargeContigs.txt', 'w')
     count = 0
+    #initialize count to 0 and parse SPAdes output as fasta
     handle = SeqIO.parse('./SpadesAssembly/contigs.fasta','fasta')
+    #if the sequence len  is greater than 1000 add to count
+    #Add sequences greater than 1000 to outfile
     for record in handle:
         m = len(record.seq)
         if m > 1000:
@@ -174,22 +202,35 @@ def numContigs():
 
 
 def countContigs():
+    """
+    This sums the total amount of base pairs in the assembly
+
+    """
     newFile = open('LargeContigs.txt', 'r')
+    #parse file with the contigs > 1000 as a fasta
     handle = SeqIO.parse('LargeContigs.txt', 'fasta')
     lenList = []
+    #add each sequence len to a list
     for record in handle:
         m = len(record.seq)
-        lenList.append(int(m))    
+        lenList.append(int(m))
+    #sum the list
     total = sum(lenList) 
    
     logging.info('There are '+str(total)+' bp in the assembly.')
 
 
 def assembleContigs():
+    """
+    This concatenates the contigs > 1000 into one fasta seq separated by 50 Ns
+
+    """
     assemblyFile = open('Assemble.fasta','w')
     inFile = open('LargeContigs.txt','r')
     handle = SeqIO.parse(inFile, 'fasta')
     concat = ''
+    #parse large contigs file as fasta, build a string of record.seq objects
+    #separate by 50 N's
     for record in handle:
         seq = str(record.seq)
         concat+= seq+ 'NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN'
@@ -198,17 +239,27 @@ def assembleContigs():
 
 
 def blast():
+    """ Runs Blast on file with large contigs concatenated """
     inFile = open('Assemble.fasta').read()
+    #blast command with added entrez_query to limit search
     blast1 = NCBIWWW.qblast('blastn','nr',inFile, entrez_query='10292[taxid]')
     with open('my_blast.xml', 'w') as outhandle:
         outhandle.write(blast1.read())
     outhandle.close()
+    #parse output
     qresult = SearchIO.read('my_blast.xml','blast-xml')
+    #adds first line to log file of desired information
     logging.info('seq_title\talign_len\tnumber_HSPs\ttopHSP_ident\ttopHSP_gaps\ttopHSP_bits\ttopHSP_expect')
+    #length of results
     m = len(qresult)
+    #num for top ten (limit to first 10 results)
     top_ten = 9
+    #was not sure if there would be 10 results, so if there arent, set topten to m
     if top_ten > m:
         top_ten = m
+    #for the first 10 resutls
+    #store hit and hsp information as variables. res would be the hit. 
+    #add variables to log separated by tab
     for i in range(0, top_ten):
         res = qresult[i]
         hsp1 = qresult[i][0]
@@ -233,6 +284,7 @@ def main():
     print(args.srrfiles)
   
     #This is where I download and split the SRR data files. Commented out to save time.
+    #Use test data from cloned git hub
 #    for i in args.srrfiles:
 #       InptFiles(i)
 
@@ -243,7 +295,7 @@ def main():
     for i in args.srrfiles:
         Kallisto(i)
 
-    SleuthInput()
+    SleuthInput(args.srrfiles)
     Sleuth()
 
     
