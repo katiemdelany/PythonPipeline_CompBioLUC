@@ -93,12 +93,21 @@ def SleuthInput():
     covFile.close()
 
 
+def Sleuth():
+    runSleuth = 'Rscript sleuth.R'
+    os.system(runSleuth)
+    output = open('topten.txt','r')
+    listoflines= output.readlines()
+    for line in listoflines:
+        logging.info(line)
+
+
 
 def bowtie2build(SRR):
     """ Builds a Bowtie index for HCMV """
-    build_cmd = 'bowtie2-build ./EF999921.fasta EF999921'
+    build_cmd = 'bowtie2-build ./EF999921.fasta HCMV'
     os.system(build_cmd)
-    bowtie_cmd = 'bowtie2 --quiet --no-unal -x EF999921 -1 '+SRR+'_1.fastq -2'+SRR+'_2.fastq -S '+SRR+ '.sam'
+    bowtie_cmd = 'bowtie2 --quiet --al-conc --no-unal -x HCMV -1 '+SRR+'_1.fastq -2'+SRR+'_2.fastq -S '+SRR+ '.sam'
     os.system(bowtie_cmd)
 
 
@@ -139,7 +148,7 @@ def getNumReads(SRR):
         count2 +=1
     afterCount = count2/4
 
-    logging.info(str(name)+' had ' +str(beforeCount) + ' read pairs before Bowtie2 filtering and '+ str(afterCount)+' pairs after').
+    logging.info(str(name)+' had ' +str(beforeCount) + ' read pairs before Bowtie2 filtering and '+ str(afterCount)+' pairs after.')
 
 
 
@@ -151,7 +160,7 @@ def SPAdes(SRRs):
     spades_cmd = 'spades -k 55,77,99,127 -t 2 --only-assembler -s '+SRR1+'_bow.fastq -s '+SRR2+'_bow.fastq -s '+SRR3+ '_bow.fastq -s '+SRR4 + '_bow.fastq -o SpadesAssembly/'
     os.system(spades_cmd)
    
-   logging.info(str(spades_cmd))
+    logging.info(str(spades_cmd))
 
 
 
@@ -170,20 +179,49 @@ def numContigs():
 
 
 
-def countAssembly():
+def countContigs():
     newFile = open('LargeContigs.txt', 'r')
-    assemblyFile = open('Assembly.txt','w')
     handle = SeqIO.parse('LargeContigs.txt', 'fasta')
     lenList = []
-    #assemblyFile.write('>Assembly Fasta\n')
     for record in handle:
         m = len(record.seq)
-        lenList.append(int(m))
-        assemblyFile.write(str(record.seq)+ 'NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN')
-    assemblyFile.close()    
+        lenList.append(int(m))    
     total = sum(lenList) 
    
-   logging.info('There are '+str(total)+' bp in the assembly.')
+    logging.info('There are '+str(total)+' bp in the assembly.')
+
+
+def assembleContigs():
+    assemblyFile = open('Assemble.fasta','w')
+    inFile = open('LargeContigs.txt','r')
+    handle = SeqIO.parse(inFile, 'fasta')
+    concat = ''
+    for record in handle:
+        seq = str(record.seq)
+        concat+= seq+ 'NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN'
+    assemblyFile.write(concat)
+    assemblyFile.close()
+
+
+def blast():
+    inFile = open('Assemble.fasta').read()
+    blast1 = NCBIWWW.qblast('blastn','nr',inFile, entrez_query='10292[taxid]')
+    with open('my_blast.xml', 'w') as outhandle:
+        outhandle.write(blast1.read())
+    outhandle.close()
+    blast_record = SearchIO.read('my_blast.xml','blast-xml')
+    addResult = ''
+    logging.info('seq_title\talign_len\tnumber_HSPs\ttopHSP_ident\ttopHSP_gaps\ttopHSP_bits\ttopHSP_expect')
+    for alignment in blast_record.alignments:
+        for hsp in alignment.hsps:
+            seq_title = str(hsp.id)
+            align_len = str(hsp.seq_len)
+            number_HSPs = str(len(hsp.hsps))
+            topHSP_ident = str(hsp.ident_num)
+            topHSP_gaps = str(gap_num)
+            topHSP_bits = str(hsp.bitscore)
+            topHSP_expect = str(hsp.evalue)
+            logging.info(seq_title + '\t' + align_len+ '\t'+ number_HSPs+ '\t'+topHSP_ident+ '\t'+ topHSP_gaps+ '\t'+ topHSP_bits+ '\t'+ topHSP_expect)
 
 
 
@@ -223,9 +261,10 @@ def main():
 #        SRRs.append(i)
 #    SPAdes(SRRs)
 
-    numContigs()
-    countAssembly()
-  
+#    numContigs()
+    countContigs()
+    assembleContigs()
+    blast()  
 
 
 
