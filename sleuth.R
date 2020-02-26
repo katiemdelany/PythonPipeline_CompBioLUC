@@ -5,7 +5,7 @@ setwd("/data/kdelany/compBio_miniProject")
 ##TABLE
 help(read.table)
 stab <- read.table("cov.txt", header=TRUE, stringsAsFactors = FALSE, sep='\t')
-View(stab)
+
 
 #sleuth object
 so <- sleuth_prep(stab)
