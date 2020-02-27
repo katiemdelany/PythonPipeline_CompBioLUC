@@ -145,7 +145,7 @@ def getNumReads(SRR):
         count1+=1
     for line in SRRfile1:
         count+=1               
-    beforeCount =(count+ count1)/4
+    beforeCount =(count+ count1)/8
     AfterFile1 = open('BOW_'+SRR+'.1.fastq')
     AfterFile2 = open('BOW_'+SRR+'.2.fastq')
     #count reads after bowtie mapping
@@ -155,7 +155,7 @@ def getNumReads(SRR):
         count2 +=1
     for line in AfterFile2:
         count3 +=1
-    afterCount =(count3+ count2)/4
+    afterCount =(count3+ count2)/8
 
     logging.info(str(name)+' had ' +str(beforeCount) + ' read pairs before Bowtie2 filtering and '+ str(afterCount)+' pairs after.')
 
