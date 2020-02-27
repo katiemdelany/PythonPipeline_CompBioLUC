@@ -31,6 +31,13 @@ python3 miniMain.py SRR5660030 SRR5660033 SRR5660044 SRR5660045
 ### Files Included in Repo:
 #### miniMain.py: 
 miniMain.py runs the whole pipeline and contains helper function to complete each step. It outputs files to multiple folders and writes into a .log file to record key results.
+##### Output of miniMain.py:
+miniproject.log - contains key results of pipeline
+EF999921.fasta - HCMV genome
+EF999921_CDS.fasta - coding sequences of HCMV genome
+LargeContig.txt - all contigs over 1000 bp
+Assemble.fasta - assembly file of LargeContig.txt
+
 #### transcriptIdx.py:
 This was used for development of the helper function used to retrieve and generate appropriate input for Kallisto.
 #### sleuthInput.py:
