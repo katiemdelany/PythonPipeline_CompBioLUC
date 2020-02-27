@@ -110,9 +110,9 @@ def Sleuth():
 
 def bowtie2build(SRR):
     """ Builds a Bowtie index for HCMV """
-    build_cmd = 'bowtie2-build ./EF999921_CDS.fasta EF999921'
+    build_cmd = 'bowtie2-build ./EF999921.fasta EF99992_1'
     os.system(build_cmd)
-    bowtie_cmd = 'bowtie2 --quiet --no-unal --al-conc BOW_'+SRR+'.fastq -x EF999921 -1 '+SRR+ '_1.fastq -2'+SRR+'_2.fastq -S '+SRR+ '.sam'
+    bowtie_cmd = 'bowtie2 --quiet --no-unal --al-conc BOW_'+SRR+'.fastq -x EF99992_1 -1 '+SRR+ '_1.fastq -2'+SRR+'_2.fastq -S '+SRR+ '.sam'
     os.system(bowtie_cmd)
 
 
