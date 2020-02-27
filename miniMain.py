@@ -11,6 +11,7 @@ os.chdir(curr)
 
 
 def arg_parser():
+    """ sets up argument parser and returns the parser   """
     parser = argparse.ArgumentParser(description='Evaluate sra files')
     parser.add_argument('srrfiles', metavar= '.srr', type=str, nargs = '*', help = 'SRRs')
 
@@ -82,7 +83,7 @@ def SleuthInput(SRRs):
     condition2 = "6dpi"
     #initial line in file
     covFile.write('sample'+ '\t' + 'condition' + '\t' + 'path' + '\n')
-    #based on SRR number, write condition and path to input file
+    #based on SRR number, write condition and path to outnput file
     for i in SRRs:
         path = '/data/kdelany/compBio_miniProject/'+i
         if int(i[3:])%2==0:
@@ -163,7 +164,7 @@ def getNumReads(SRR):
 
 def SPAdes(SRRs):
     """
-    Sets SRRs to separate variables
+    Runs spades on the paired-end fastqs for each SRR entered
     """
     SRR1= SRRs[0]
     SRR2= SRRs[1]
@@ -281,7 +282,7 @@ def main():
     print(args.srrfiles)
   
     #This is where I download and split the SRR data files. Commented out to save time.
-    #Use test data from cloned git hub
+    #If you use cloned git hub, the test files are in the repo. 
 #    for i in args.srrfiles:
 #       InptFiles(i)
 
