@@ -1,5 +1,5 @@
-# compBio_miniProject
-This repository contains Python code from the Comp Bio Mini Project. Project focuses on Human herpesvirus 5.
+# Computational Biology 483 Loyola University Chicago
+This repository contains Python code from an LUC Computational Biology project. Project focuses on Human herpesvirus 5.
 
 ### Software Requirements
 * Linux/Unix
@@ -45,5 +45,6 @@ This takes the output from Kallisto and creates a tab-delimited input file for s
 #### samtofastq.sh
 A bash shell script that converts sam files from Bowtie2 to fastq files to be used in SPAdes
 
-
+### Author
+Kathleen M. Delany
 
